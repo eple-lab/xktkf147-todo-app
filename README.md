@@ -1,22 +1,15 @@
 # Todo 앱
 
-로컬에서 도는 Todo 앱. Node.js 24 + Express + SQLite(`node:sqlite`, 별도 빌드 도구 불필요).
+Node.js 24 + Express + Supabase(Postgres, Auth, RLS). 할 일 추가/목록/완료/삭제, 마감일, 오늘 할 일만 보기.
+로그인한 사용자는 자기 할 일만 볼 수 있다.
 
-## 실행
-```
-npm install
-copy .env.example .env
-npm start
-```
-브라우저에서 http://localhost:4321 을 연다. 데이터는 `todo.db`(자동 생성)에 저장된다.
+과제 제출 내용과 실행 방법은 [제출.md](제출.md)를 본다.
 
 ## 구조
-- `server/db.js` — SQLite 접근(파라미터화 쿼리). DB 코드는 여기에만 있다.
-- `server/index.js` — Express API (`/api/todos`)
-- `public/` — 화면(API만 호출)
-- 설계: `PRD.md`, `DB-설계.md`
+- `server/supabase.js` — Supabase 접근. DB 코드는 여기에만 있다.
+- `server/index.js` — Express API (`/api/auth/*`, `/api/todos`)
+- `public/` — 화면(백엔드 API만 호출)
+- `supabase/schema.sql` — 표와 RLS 정책
+- 문서: `PRD.md`, `DB-설계.md`, `배포-준비물.md`
 
-## PRD 확인 조건 점검 결과
-- [x] 할 일을 추가하고 새로고침·앱 재시작 후에도 남는다
-- [x] 완료 표시와 삭제가 동작하고, 그 결과도 재시작 후에 남는다
-- [x] 마감일이 오늘인 할 일만 걸러 볼 수 있다
+로컬 SQLite 버전(길 A)은 `git checkout path-a`.
