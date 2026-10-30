@@ -1,9 +1,20 @@
+const authView = document.getElementById('auth-view');
+const appView = document.getElementById('app-view');
+const authForm = document.getElementById('auth-form');
+const emailInput = document.getElementById('email');
+const passwordInput = document.getElementById('password');
+const btnSignup = document.getElementById('btn-signup');
+const btnLogout = document.getElementById('btn-logout');
+const userBar = document.getElementById('user-bar');
+const userEmail = document.getElementById('user-email');
+
 const form = document.getElementById('add-form');
 const titleInput = document.getElementById('title');
 const dueInput = document.getElementById('due');
 const list = document.getElementById('list');
 const emptyMsg = document.getElementById('empty');
 const errorBox = document.getElementById('error');
+const noticeBox = document.getElementById('notice');
 const btnAll = document.getElementById('btn-all');
 const btnToday = document.getElementById('btn-today');
 
@@ -21,17 +32,39 @@ function showError(msg) {
   errorBox.hidden = !msg;
 }
 
+function showNotice(msg) {
+  noticeBox.textContent = msg || '';
+  noticeBox.hidden = !msg;
+}
+
+class AuthError extends Error {}
+
 async function api(url, options) {
   const res = await fetch(url, {
     headers: { 'Content-Type': 'application/json' },
     ...options,
   });
+  if (res.status === 401 && url !== '/api/auth/login') throw new AuthError('로그인이 필요합니다.');
   if (!res.ok) {
     let msg = '요청에 실패했습니다.';
     try { msg = (await res.json()).error || msg; } catch {}
     throw new Error(msg);
   }
   return res.status === 204 ? null : res.json();
+}
+
+function showLoggedOut() {
+  appView.hidden = true;
+  userBar.hidden = true;
+  authView.hidden = false;
+  list.replaceChildren();
+}
+
+function showLoggedIn(email) {
+  authView.hidden = true;
+  appView.hidden = false;
+  userBar.hidden = false;
+  userEmail.textContent = email;
 }
 
 function render(todos) {
@@ -79,8 +112,10 @@ function render(todos) {
 }
 
 async function load() {
-  const todos = await api(todayOnly ? '/api/todos?filter=today' : '/api/todos');
-  render(todos);
+  const url = todayOnly
+    ? `/api/todos?filter=today&date=${encodeURIComponent(localToday())}`
+    : '/api/todos';
+  render(await api(url));
 }
 
 async function run(action) {
@@ -89,7 +124,12 @@ async function run(action) {
     await action();
     await load();
   } catch (e) {
-    showError(e.message);
+    if (e instanceof AuthError) {
+      showLoggedOut();
+      showError('로그인이 필요합니다.');
+    } else {
+      showError(e.message);
+    }
   }
 }
 
@@ -99,6 +139,53 @@ function setFilter(today) {
   btnAll.classList.toggle('active', !today);
   run(() => Promise.resolve());
 }
+
+function credentials() {
+  return JSON.stringify({ email: emailInput.value, password: passwordInput.value });
+}
+
+async function enter(email) {
+  passwordInput.value = '';
+  showLoggedIn(email);
+  await run(() => Promise.resolve());
+}
+
+authForm.addEventListener('submit', async (e) => {
+  e.preventDefault();
+  showError('');
+  showNotice('');
+  try {
+    const me = await api('/api/auth/login', { method: 'POST', body: credentials() });
+    await enter(me.email);
+  } catch (err) {
+    showError(err.message);
+  }
+});
+
+btnSignup.addEventListener('click', async () => {
+  if (!authForm.reportValidity()) return;
+  showError('');
+  showNotice('');
+  try {
+    const res = await fetch('/api/auth/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: credentials(),
+    });
+    const body = await res.json().catch(() => ({}));
+    if (res.status === 201) return await enter(body.email);
+    if (res.status === 202) return showNotice(body.message);
+    showError(body.error || '가입에 실패했습니다.');
+  } catch (err) {
+    showError(err.message);
+  }
+});
+
+btnLogout.addEventListener('click', async () => {
+  try { await api('/api/auth/logout', { method: 'POST' }); } catch {}
+  showError('');
+  showLoggedOut();
+});
 
 form.addEventListener('submit', (e) => {
   e.preventDefault();
@@ -114,4 +201,12 @@ form.addEventListener('submit', (e) => {
 btnAll.addEventListener('click', () => setFilter(false));
 btnToday.addEventListener('click', () => setFilter(true));
 
-run(() => Promise.resolve());
+(async () => {
+  try {
+    const me = await api('/api/auth/me');
+    showLoggedIn(me.email);
+    await run(() => Promise.resolve());
+  } catch {
+    showLoggedOut();
+  }
+})();

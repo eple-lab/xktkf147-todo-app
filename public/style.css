@@ -1,7 +1,14 @@
 * { box-sizing: border-box; }
 body { font-family: system-ui, "Malgun Gothic", sans-serif; background: #f4f5f7; margin: 0; color: #222; }
 main { max-width: 560px; margin: 40px auto; padding: 0 16px; }
-h1 { margin: 0 0 16px; }
+header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+h1 { margin: 0; }
+#user-bar { display: flex; align-items: center; gap: 8px; font-size: 0.9em; color: #555; }
+#auth-form { display: flex; flex-direction: column; gap: 8px; }
+#auth-form .row { display: flex; gap: 8px; }
+#btn-login { background: #2f6fed; border-color: #2f6fed; color: #fff; }
+#notice { color: #1b6e2f; margin: 8px 0; }
+[hidden] { display: none !important; }
 
 #add-form { display: flex; gap: 8px; margin-bottom: 12px; }
 #title { flex: 1; min-width: 0; }

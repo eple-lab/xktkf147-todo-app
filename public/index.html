@@ -8,22 +8,43 @@
 </head>
 <body>
   <main>
-    <h1>Todo</h1>
-
-    <form id="add-form">
-      <input id="title" type="text" placeholder="할 일을 입력하세요" maxlength="200" required>
-      <input id="due" type="date" aria-label="마감일(선택)">
-      <button type="submit">추가</button>
-    </form>
-
-    <div class="filters">
-      <button id="btn-all" type="button" class="active">전체 보기</button>
-      <button id="btn-today" type="button">오늘 할 일만</button>
-    </div>
+    <header>
+      <h1>Todo</h1>
+      <div id="user-bar" hidden>
+        <span id="user-email"></span>
+        <button id="btn-logout" type="button">로그아웃</button>
+      </div>
+    </header>
 
     <p id="error" role="alert" hidden></p>
-    <ul id="list"></ul>
-    <p id="empty" hidden>할 일이 없습니다.</p>
+    <p id="notice" hidden></p>
+
+    <section id="auth-view" hidden>
+      <form id="auth-form">
+        <input id="email" type="email" placeholder="이메일" autocomplete="email" required>
+        <input id="password" type="password" placeholder="비밀번호(6자 이상)" autocomplete="current-password" required>
+        <div class="row">
+          <button id="btn-login" type="submit">로그인</button>
+          <button id="btn-signup" type="button">회원가입</button>
+        </div>
+      </form>
+    </section>
+
+    <section id="app-view" hidden>
+      <form id="add-form">
+        <input id="title" type="text" placeholder="할 일을 입력하세요" maxlength="200" required>
+        <input id="due" type="date" aria-label="마감일(선택)">
+        <button type="submit">추가</button>
+      </form>
+
+      <div class="filters">
+        <button id="btn-all" type="button" class="active">전체 보기</button>
+        <button id="btn-today" type="button">오늘 할 일만</button>
+      </div>
+
+      <ul id="list"></ul>
+      <p id="empty" hidden>할 일이 없습니다.</p>
+    </section>
   </main>
   <script src="app.js"></script>
 </body>
