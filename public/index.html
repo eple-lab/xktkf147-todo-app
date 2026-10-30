@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Todo</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main>
+    <h1>Todo</h1>
+
+    <form id="add-form">
+      <input id="title" type="text" placeholder="할 일을 입력하세요" maxlength="200" required>
+      <input id="due" type="date" aria-label="마감일(선택)">
+      <button type="submit">추가</button>
+    </form>
+
+    <div class="filters">
+      <button id="btn-all" type="button" class="active">전체 보기</button>
+      <button id="btn-today" type="button">오늘 할 일만</button>
+    </div>
+
+    <p id="error" role="alert" hidden></p>
+    <ul id="list"></ul>
+    <p id="empty" hidden>할 일이 없습니다.</p>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
